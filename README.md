@@ -24,4 +24,5 @@
 
 Тестирование данной библиотеки проводились в полевых условиях на реальном [ровере](https://msuroverteam.org/wp-content/uploads/2025/09/IMG_20250601_104500-min-scaled.jpg) на платформе Nvidia Jetson Orin NX Super с камерой Lucid Triton TRI016S-CC.
 
-[MSU ROVER TEAM](https://msuroverteam.org/ru/){:target="_blank"}
+<a href="https://msuroverteam.org" target="_blank" rel="noopener noreferrer">MSU ROVER TEAM</a>
+
