@@ -472,7 +472,7 @@ cv2.destroyAllWindows()
 if \__name__ == "\__main_\_":
 process_webcam()
 ```
-### **Пошаговая инструкция примера.**
+### **Пошаговая инструкция запуска примера.**
 ```
 python3 example_webcam.py
 ```
@@ -563,7 +563,7 @@ help="Путь к выходному видео")
 args = parser.parse_args()
 process_video(args.input, args.output)
 ```
-### **Пошаговая инструкция примера.**
+### **Пошаговая инструкция запуска примера.**
 ```
 python3 example_video_processing.py input_video.mp4 -o result_video.mp4
 ```
@@ -669,7 +669,7 @@ print("\]")
 if \__name__ == "\__main_\_":
 calibrate_camera()
 ```
-### **Пошаговая инструкция примера.**
+### **Пошаговая инструкция запуска примера.**
 ```
 python3 example_calibration.py
 ```
@@ -749,7 +749,7 @@ rclpy.shutdown()
 if \__name__ == '\__main_\_':
 main()
 ```
-### **Пошаговая инструкция примера.**
+### **Пошаговая инструкция запуска примера.**
 ```
 \# Терминал 1: Запуск камеры
 ros2 run usb_cam usb_cam_node_exe
@@ -888,7 +888,7 @@ help="Папка для результатов")
 args = parser.parse_args()
 batch_process(args.input, args.output)
 ```
-### **Пошаговая инструкция примера.**
+### **Пошаговая инструкция запуска примера.**
 ```
 \# Обработка всех изображений в папке
 
