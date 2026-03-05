@@ -390,836 +390,507 @@ python3 -c "from ultralytics import YOLO; print('YOLO загружен успе�
 ### **Пошаговая инструкция запуска примера.**
 
 1.  Подготовка тестового изображения:
-
-\# Поместите изображение со стрелкой или конусом  
-\# в корневую директорию репозитория (MSUROVERTEAM-CV/)
-
+```
+\# Поместите изображение со стрелкой или конусом в корневую директорию репозитория (MSUROVERTEAM-CV/)
 \# Назовите его test_image.jpg
-
+```
 1.  Запуск скрипта:
-
+```
 python3 example_basic.py
-
+```
 1.  Ожидаемый вывод:
-
+```
 Инициализация детектора...
-
 Загрузка изображения...
-
 Выполнение детекции...
-
 Обнаружено объектов: 2
-
+```
 \------------------------------------------------------------
-
 Объект #1:
-
 Тип: arrow
-
 Направление: left
-
 Расстояние: 3.50 м
-
 Угол: -15.2°
-
 Уверенность: 92.30%
-
 Координаты: (120, 150, 250, 280)
-
+```
 # **Примеры вариантов использования библиотеки.**
 
 ## **Обработка видеопотока с веб-камеры.**
 
 Создайте файл \`example_webcam.py\`:
-
+```
 #!/usr/bin/env python3
 
 \# Пример обработки видеопотока с веб-камеры в реальном времени
 
 import cv2
-
 import sys
-
 from pathlib import Path
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 def process_webcam():
 
 \# Инициализация детектора
-
 detector = NavigationDetector("weights/best.pt")
 
 \# Открытие веб-камеры (0 - камера по умолчанию)
-
 cap = cv2.VideoCapture(0)
-
 if not cap.isOpened():
-
 print("Ошибка: не удалось открыть камеру")
-
 return
-
 print("Нажмите 'q' для выхода")
-
 while True:
-
 ret, frame = cap.read()
-
 if not ret:
-
 break
 
 \# Детекция объектов
-
 detections = detector.detect_all(frame)
 
 \# Визуализация
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
-
 color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
-
 cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
 
 \# Текст с информацией
-
 info = f"{det.object_type}"
-
 if det.direction != "none":
-
 info += f" {det.direction}"
-
 info += f" {det.distance_m:.1f}m"
-
 cv2.putText(frame, info, (x1, y1-10),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
 \# Показ FPS
-
 cv2.putText(frame, f"Objects: {len(detections)}", (10, 30),
-
 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
 cv2.imshow("Navigation Detection", frame)
-
 if cv2.waitKey(1) & 0xFF == ord('q'):
-
 break
-
 cap.release()
-
 cv2.destroyAllWindows()
-
 if \__name__ == "\__main_\_":
-
 process_webcam()
-
+```
 ### **Пошаговая инструкция примера.**
-
+```
 python3 example_webcam.py
-
+```
 ## **Обработка видеофайла с сохранением результатов/**
 
 Создайте файл \` example_video_processing.py\`:
-
+```
 #!/usr/bin/env python3
 
 #Обработка видеофайла с сохранением аннотированного видео
 
 import cv2
-
 import sys
-
 from pathlib import Path
-
 import time
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 def process_video(input_path, output_path):
 
 \# Инициализация
-
 detector = NavigationDetector("weights/best.pt")
 
 \# Открытие видео
-
 cap = cv2.VideoCapture(input_path)
-
 fps = int(cap.get(cv2.CAP_PROP_FPS))
-
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 \# Настройка записи
-
 fourcc = cv2.VideoWriter_fourcc(\*'mp4v')
-
 out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
 print(f"Обработка видео: {total_frames} кадров")
-
 frame_count = 0
-
 start_time = time.time()
-
 while cap.isOpened():
-
 ret, frame = cap.read()
-
 if not ret:
-
 break
-
 frame_count += 1
 
 \# Детекция
-
 detections = detector.detect_all(frame)
 
 \# Отрисовка результатов
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
-
 color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
-
 cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-
 label = f"{det.object_type}"
-
 if det.direction != "none":
-
 label += f" {det.direction}"
-
 label += f" {det.distance_m:.1f}m | {det.angle_deg:.0f}°"
-
 cv2.putText(frame, label, (x1, y1-10),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 \# Информационная панель
-
 cv2.rectangle(frame, (0, 0), (width, 40), (0, 0, 0), -1)
-
 info = f"Frame: {frame_count}/{total_frames} | Objects: {len(detections)}"
-
 cv2.putText(frame, info, (10, 25),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
 \# Запись кадра
-
 out.write(frame)
 
 \# Прогресс
-
 if frame_count % 30 == 0:
-
 elapsed = time.time() - start_time
-
 fps_processing = frame_count / elapsed
-
 eta = (total_frames - frame_count) / fps_processing
-
 print(f"Прогресс: {frame_count}/{total_frames} "
-
 f"({frame_count/total_frames\*100:.1f}%) "
-
 f"FPS: {fps_processing:.1f} ETA: {eta:.0f}s")
 
 \# Освобождение ресурсов
-
 cap.release()
-
 out.release()
-
 cv2.destroyAllWindows()
-
 elapsed = time.time() - start_time
-
 print(f"\\nОбработка завершена за {elapsed:.1f} секунд")
-
 print(f"Результат сохранен в {output_path}")
-
 if \__name__ == "\__main_\_":
-
 import argparse
-
 parser = argparse.ArgumentParser(description="Обработка видеофайла")
-
 parser.add_argument("input", help="Путь к входному видео")
-
 parser.add_argument("-o", "--output", default="output.mp4",
-
 help="Путь к выходному видео")
-
 args = parser.parse_args()
-
 process_video(args.input, args.output)
-
+```
 ### **Пошаговая инструкция примера.**
-
+```
 python3 example_video_processing.py input_video.mp4 -o result_video.mp4
-
+```
 ## **Калибровка камеры для точного измерения расстояний**
 
 Создайте файл \` example_calibration.py\`:
-
+```
 #!/usr/bin/env python3
 
 #Калибровка камеры для точного измерения расстояний
-
 #Поместите стрелку на известных расстояниях и измерьте размеры в пикселях
 
 import cv2
-
 import sys
-
 from pathlib import Path
-
 import json
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 def calibrate_camera():
-
 detector = NavigationDetector("weights/best.pt")
-
 cap = cv2.VideoCapture(0)
-
 calibration_data = {
-
 "arrows": \[\],
-
 "cones": \[\]
-
 }
-
 print("КАЛИБРОВКА КАМЕРЫ")
-
 print("-" \* 40)
-
 print("Инструкции:")
-
 print("1. Поместите объект на известное расстояние")
-
 print("2. Нажмите ПРОБЕЛ для захвата")
-
 print("3. Введите расстояние в метрах")
-
 print("4. Повторите для разных расстояний (1-10м)")
-
 print("5. Нажмите 'q' для завершения")
-
 print("-" \* 40)
-
 while True:
-
 ret, frame = cap.read()
-
 if not ret:
-
 break
 
 \# Детекция
-
 detections = detector.detect_all(frame)
 
 \# Визуализация
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
-
 width = x2 - x1
-
 height = y2 - y1
-
 color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
-
 cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
 
 \# Показываем размеры в пикселях
-
 info = f"{det.object_type} | W:{width}px H:{height}px"
-
 cv2.putText(frame, info, (x1, y1-10),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-
 cv2.imshow("Calibration", frame)
-
 key = cv2.waitKey(1) & 0xFF
-
 if key == ord(' ') and len(detections) > 0:
 
 \# Захват калибровочной точки
-
 det = detections\[0\] # Берем первый обнаруженный объект
-
 x1, y1, x2, y2 = det.bbox
-
 width = x2 - x1
-
 height = y2 - y1
 
 \# Запрос расстояния у пользователя
-
 cv2.imwrite("calibration_capture.jpg", frame)
-
 distance = float(input(f"Введите расстояние до {det.object_type} (м): "))
 
 \# Сохранение данных
-
 calib_point = {
-
 "distance_m": distance,
-
 "width_px": width,
-
 "height_px": height
-
 }
-
 if det.object_type == "arrow":
-
 calibration_data\["arrows"\].append(calib_point)
-
 else:
-
 calibration_data\["cones"\].append(calib_point)
-
 print(f"Сохранено: {distance}м -> {width}x{height}px")
-
 print(f"Точек для стрелок: {len(calibration_data\['arrows'\])}")
-
 print(f"Точек для конусов: {len(calibration_data\['cones'\])}")
-
 elif key == ord('q'):
-
 break
-
 cap.release()
-
 cv2.destroyAllWindows()
 
 \# Сохранение калибровочных данных
-
 with open("calibration_data.json", "w") as f:
-
 json.dump(calibration_data, f, indent=2)
-
 print("\\nКалибровка завершена!")
-
 print("Данные сохранены в calibration_data.json")
 
 \# Генерация Python кода для calibration_config.py
-
 print("\\nДобавьте следующие данные в calibration_config.py:")
-
 print("\\nCALIBRATION_TABLE_ARROWS = \[")
-
 for point in sorted(calibration_data\["arrows"\], key=lambda x: x\["distance_m"\]):
-
 print(f" ({point\['distance_m'\]}, {point\['width_px'\]}, {point\['height_px'\]}),")
-
 print("\]")
-
 print("\\nCALIBRATION_TABLE_CONES = \[")
-
 for point in sorted(calibration_data\["cones"\], key=lambda x: x\["distance_m"\]):
-
 print(f" ({point\['distance_m'\]}, {point\['width_px'\]}, {point\['height_px'\]}),")
-
 print("\]")
-
 if \__name__ == "\__main_\_":
-
 calibrate_camera()
-
+```
 ### **Пошаговая инструкция примера.**
-
+```
 python3 example_calibration.py
-
+```
 ## **Интеграция с ROS 2 для управления роботом**
 
 Создайте файл \` example_ros_integration.py\`:
-
+```
 #!/usr/bin/env python3
 
 #Интеграция с ROS 2 для передачи данных детекции в систему управления
 
 import rclpy
-
 from rclpy.node import Node
-
 from sensor_msgs.msg import Image, JointState
-
 from cv_bridge import CvBridge
-
 import cv2
-
 import sys
-
 from pathlib import Path
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 class NavigationDetectorNode(Node):
-
 def \__init_\_(self):
-
 super().\__init_\_('navigation_detector')
 
 \# Инициализация детектора
-
 self.detector = NavigationDetector("weights/best.pt")
 
 \# ROS интерфейсы
-
 self.bridge = CvBridge()
 
 \# Подписка на изображения с камеры
-
-self.image_sub = self.create_subscription(
-
-Image,
-
-'/camera/image_raw',
-
-self.image_callback,
-
-10
-
-)
+self.image_sub = self.create_subscription(Image, '/camera/image_raw', self.image_callback, 10 )
 
 \# Публикация результатов детекции
-
 self.detection_pub = self.create_publisher(
-
 JointState, # Используем JointState для совместимости с nav_simple
-
 'arrow_detection',
-
 10
-
 )
 
 self.get_logger().info('Navigation Detector Node запущен')
-
 def image_callback(self, msg):
 
 \# Конвертация ROS Image в OpenCV
-
 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
 \# Детекция
-
 detections = self.detector.detect_all(cv_image)
 
 \# Подготовка сообщения с результатами
-
 detection_msg = JointState()
-
 detection_msg.header.stamp = self.get_clock().now().to_msg()
-
 for det in detections:
-
 detection_msg.name.append(det.direction)
-
 detection_msg.position.append(det.distance_m)
-
 detection_msg.velocity.append(det.angle_deg)
-
 detection_msg.effort.append(det.confidence)
 
 \# Публикация результатов
-
 self.detection_pub.publish(detection_msg)
 
 \# Логирование
-
 if len(detections) > 0:
-
 self.get_logger().info(
-
 f'Обнаружено объектов: {len(detections)}'
-
 )
-
 def main(args=None):
-
 rclpy.init(args=args)
-
 node = NavigationDetectorNode()
-
 try:
-
 rclpy.spin(node)
-
 except KeyboardInterrupt:
-
 pass
-
 finally:
-
 node.destroy_node()
-
 rclpy.shutdown()
-
 if \__name__ == '\__main_\_':
-
 main()
-
+```
 ### **Пошаговая инструкция примера.**
-
+```
 \# Терминал 1: Запуск камеры
-
 ros2 run usb_cam usb_cam_node_exe
 
 \# Терминал 2: Запуск детектора
-
 python3 example_ros_integration.py
 
 \# Терминал 3: Запуск навигации (опционально)
-
 python3 nav_simple.pypython3 example_calibration.py
-
+```
 ## **Пакетная обработка изображений**
 
 Создайте файл \` example_batch_processing.py\`:
-
+```
 #!/usr/bin/env python3
 
 #Пакетная обработка множества изображений с генерацией отчета
 
 import cv2
-
 import sys
-
 from pathlib import Path
-
 import json
-
 from datetime import datetime
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 def batch_process(input_folder, output_folder):
 
 \# Создание выходной директории
-
 output_path = Path(output_folder)
-
 output_path.mkdir(parents=True, exist_ok=True)
 
 \# Инициализация детектора
-
 detector = NavigationDetector("weights/best.pt")
 
 \# Получение списка изображений
-
 image_extensions = \['.jpg', '.jpeg', '.png', '.bmp'\]
-
 image_files = \[\]
-
 for ext in image_extensions:
-
 image_files.extend(Path(input_folder).glob(f'\*{ext}'))
-
 image_files.extend(Path(input_folder).glob(f'\*{ext.upper()}'))
-
 print(f"Найдено изображений: {len(image_files)}")
 
 \# Результаты для отчета
-
 report = {
-
 "timestamp": datetime.now().isoformat(),
-
 "total_images": len(image_files),
-
 "processed_images": 0,
-
 "total_detections": 0,
-
 "arrows_detected": 0,
-
 "cones_detected": 0,
-
 "results": \[\]
-
 }
 
 \# Обработка каждого изображения
-
 for img_path in image_files:
-
 print(f"Обработка: {img_path.name}")
 
 \# Загрузка изображения
-
 image = cv2.imread(str(img_path))
-
 if image is None:
-
 print(f" Ошибка загрузки, пропуск")
-
 continue
 
 \# Детекция
-
 detections = detector.detect_all(image)
 
 \# Статистика
-
 arrows = \[d for d in detections if d.object_type == "arrow"\]
-
 cones = \[d for d in detections if d.object_type == "cone"\]
 
 \# Сохранение результата
-
 img_result = {
-
 "filename": img_path.name,
-
 "detections_count": len(detections),
-
 "arrows": len(arrows),
-
 "cones": len(cones),
-
 "details": \[\]
-
 }
 
 \# Визуализация
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
-
 color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
-
 cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-
 label = f"{det.object_type}"
-
 if det.direction != "none":
-
 label += f" {det.direction}"
-
 label += f" {det.distance_m:.1f}m"
-
 cv2.putText(image, label, (x1, y1-10),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 \# Добавление в отчет
-
 img_result\["details"\].append({
-
 "type": det.object_type,
-
 "direction": det.direction,
-
 "distance_m": round(det.distance_m, 2),
-
 "angle_deg": round(det.angle_deg, 1),
-
 "confidence": round(det.confidence, 3)
-
 })
 
 \# Сохранение аннотированного изображения
-
 output_file = output_path / f"annotated_{img_path.name}"
-
 cv2.imwrite(str(output_file), image)
 
 \# Обновление отчета
-
 report\["processed_images"\] += 1
-
 report\["total_detections"\] += len(detections)
-
 report\["arrows_detected"\] += len(arrows)
-
 report\["cones_detected"\] += len(cones)
-
 report\["results"\].append(img_result)
-
 print(f" Обнаружено: {len(detections)} объектов")
 
 \# Сохранение отчета
-
 report_path = output_path / "detection_report.json"
-
 with open(report_path, "w") as f:
-
 json.dump(report, f, indent=2, ensure_ascii=False)
 
 \# Вывод итоговой статистики
-
 print("\\n" + "="\*50)
-
 print("ИТОГОВАЯ СТАТИСТИКА")
-
 print("="\*50)
-
 print(f"Обработано изображений: {report\['processed_images'\]}")
-
 print(f"Всего обнаружено объектов: {report\['total_detections'\]}")
-
 print(f" - Стрелок: {report\['arrows_detected'\]}")
-
 print(f" - Конусов: {report\['cones_detected'\]}")
-
 print(f"\\nОтчет сохранен в: {report_path}")
-
 print(f"Аннотированные изображения в: {output_path}")
-
 if \__name__ == "\__main_\_":
-
 import argparse
-
 parser = argparse.ArgumentParser(
-
 description="Пакетная обработка изображений"
-
 )
-
 parser.add_argument("input", help="Папка с входными изображениями")
-
 parser.add_argument("-o", "--output", default="batch_results",
-
 help="Папка для результатов")
-
 args = parser.parse_args()
-
 batch_process(args.input, args.output)
-
+```
 ### **Пошаговая инструкция примера.**
-
+```
 \# Обработка всех изображений в папке
 
 python3 example_batch_processing.py ./images -o ./results
@@ -1229,87 +900,59 @@ python3 example_batch_processing.py ./images -o ./results
 \# - annotated_\*.jpg - изображения с разметкой
 
 \# - detection_report.json - подробный отчет
-
+```
 # **ОПТИМИЗАЦИЯ ПРОИЗВОДИТЕЛЬНОСТИ.**
 
 ## **Использование GPU**
-
+```
 \# Явное указание GPU
-
 detector = NavigationDetector("weights/best.pt", device="cuda")
 
 \# Проверка использования GPU
-
 import torch
-
 if torch.cuda.is_available():
-
 print(f"GPU: {torch.cuda.get_device_name(0)}")
-
 print(f"VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024\*\*3:.1f} GB")
-
+```
 ## **Оптимизация для встраиваемых систем**
-
+```
 \# Для Jetson - использование TensorRT
-
 detector = NavigationDetector("weights/best.pt")
 
 \# YOLO автоматически использует TensorRT если доступен
 
 \# Уменьшение разрешения для ускорения
-
 image_small = cv2.resize(image, (640, 480))
-
 detections = detector.detect_all(image_small)
 
 \# Масштабирование координат обратно
-
 scale_x = original_width / 640
-
 scale_y = original_height / 480
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
-
 det.bbox = (int(x1\*scale_x), int(y1\*scale_y),
-
 int(x2\*scale_x), int(y2\*scale_y))
-
+```
 ## **Мультипоточная обработка**
-
+```
 import concurrent.futures
-
 from threading import Lock
-
 detector = NavigationDetector("weights/best.pt")
-
 results_lock = Lock()
-
 results = \[\]
-
 def process_image(img_path):
-
 image = cv2.imread(str(img_path))
-
 detections = detector.detect_all(image)
-
 with results_lock:
-
 results.append({
-
 "file": img_path.name,
-
 "detections": len(detections)
-
 })
 
 \# Параллельная обработка
-
 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-
 executor.map(process_image, image_files)
-
+```
 # **ПРИЛОЖЕНИЕ А.**
 
 Указатель направления движения.
