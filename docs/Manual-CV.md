@@ -268,180 +268,125 @@
 # **Пример использования библиотеки.**
 
 Python код:
-
+```
 #!/usr/bin/env python3
 
 #Базовый пример использования библиотеки MSUROVERTEAM-CV
-
 #Детекция стрелок и конусов на изображении
 
 import cv2
-
 import sys
-
 from pathlib import Path
 
 \# Добавляем путь к библиотеке
-
 sys.path.append(str(Path(\__file_\_).parent))
-
 from eureka_nav_lib import NavigationDetector
-
 def main():
 
 \# Шаг 1: Инициализация детектора
-
 print("Инициализация детектора...")
-
 detector = NavigationDetector(
-
 weights_path="weights/best.pt", # Путь к файлу весов
-
 device=None # Автоматический выбор устройства (GPU если доступно)
-
 )
 
 \# Шаг 2: Загрузка изображения
-
 print("Загрузка изображения...")
-
 image_path = "test_image.jpg" # Замените на путь к вашему изображению
-
 image = cv2.imread(image_path)
-
 if image is None:
-
 print(f"Ошибка: не удалось загрузить изображение {image_path}")
-
 return
 
 \# Шаг 3: Детекция всех объектов
-
 print("Выполнение детекции...")
-
 detections = detector.detect_all(image)
 
 \# Шаг 4: Вывод результатов
-
 print(f"\\nОбнаружено объектов: {len(detections)}")
-
 print("-" \* 60)
-
 for i, det in enumerate(detections, 1):
-
 print(f"Объект #{i}:")
-
 print(f" Тип: {det.object_type}")
-
 print(f" Направление: {det.direction}")
-
 print(f" Расстояние: {det.distance_m:.2f} м")
-
 print(f" Угол: {det.angle_deg:.1f}°")
-
 print(f" Уверенность: {det.confidence:.2%}")
-
 print(f" Координаты: {det.bbox}")
-
 print()
 
 \# Шаг 5: Визуализация результатов
-
 for det in detections:
-
 x1, y1, x2, y2 = det.bbox
 
 \# Выбор цвета в зависимости от типа
-
-color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
+-color = (0, 255, 0) if det.object_type == "arrow" else (0, 165, 255)
 
 \# Рисуем прямоугольник
-
 cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
 
 \# Подготовка текста
-
 label = f"{det.object_type}"
-
 if det.direction != "none":
-
 label += f" {det.direction}"
-
 label += f" {det.distance_m:.1f}m"
 
 \# Рисуем текст
-
 cv2.putText(image, label, (x1, y1-10),
-
 cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 \# Сохранение результата
-
 output_path = "result.jpg"
-
 cv2.imwrite(output_path, image)
-
 print(f"Результат сохранен в {output_path}")
 
 \# Показ результата (если есть дисплей)
-
 cv2.imshow("Detection Result", image)
-
 cv2.waitKey(0)
-
 cv2.destroyAllWindows()
-
 if \__name__ == "\__main_\_":
-
 main()
-
+```
 ## **УСТАНОВКА БИБЛИОТЕКИ.**
 
 - Клонирование репозитория
-
+```
 git clone https://github.com/KodII-rover/MSUROVERTEAM-CV.git
-
 cd MSUROVERTEAM-CV
-
+```
 - Создание виртуального окружения (рекомендуется)
-
+```
 python3 -m venv venv
-
 source venv/bin/activate # Linux/Mac
-
 \# или
-
 venv\\Scripts\\activate # Windows
-
+```
 - Установка зависимостей
     - Вариант 1: Минимальная установка (без GPU)
-
+```
 pip install ultralytics opencv-python numpy
-
+```
 - - Вариант 2: Установка с поддержкой CUDA (NVIDIA GPU)
-
+```
 \# Установка PyTorch с CUDA (проверьте версию CUDA командой nvidia-smi)
-
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118 # для CUDA 11.8
 
 \# Установка остальных зависимостей
 
 pip install ultralytics opencv-python numpy
-
+```
 - - Установка для Jetson
-
+```
 \# На Jetson платформах PyTorch обычно предустановлен в JetPack
 
 pip install ultralytics opencv-python numpy
-
+```
 - - Проверка установки
-
+```
 python3 -c "import torch; print(f'PyTorch: {torch.\__version_\_}')"
-
 python3 -c "import cv2; print(f'OpenCV: {cv2.\__version_\_}')"
-
 python3 -c "from ultralytics import YOLO; print('YOLO загружен успешно')"
-
+```
 ### **Пошаговая инструкция запуска примера.**
 
 1.  Подготовка тестового изображения:
