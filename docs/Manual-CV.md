@@ -396,7 +396,7 @@ python3 -c "import cv2; print(f'OpenCV: {cv2.__version__}')"
 python3 -c "from ultralytics import YOLO; print('YOLO загружен успешно')"
 ```
 ### **Пошаговая инструкция запуска примера.**
-
+<a id="fix1"></a>
 1.  Подготовка тестового изображения:
 ```python
 # Поместите изображение со стрелкой или конусом в корневую директорию репозитория (MSUROVERTEAM-CV/)
