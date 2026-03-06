@@ -130,6 +130,9 @@
 - __init__() - конструктор класса;
 - detect_all() - комплексная детекция.
 
+**Данные для обучения**
+**Датасет:** Модель обучена на наборе данных [MSURoverTeam CV Dataset](https://www.kaggle.com/datasets/prttyflvck00/msuroverteam-cv-dataset), размещенном на платформе Kaggle.
+
 # **Структура программы.**
 
 Модуль: eureka_nav_lib.py
